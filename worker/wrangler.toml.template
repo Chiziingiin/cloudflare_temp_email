@@ -1,69 +1,74 @@
-name = "cloudflare_temp_email"
-main = "src/worker.ts"
-compatibility_date = "2023-12-01"
-node_compat = true
-# if you want use custom_domain, you need to add routes
-# routes = [
-# 	{ pattern = "temp-email-api.xxxxx.xyz", custom_domain = true },
-# ]
+name = "mail"
+main = "worker.js"
+compatibility_date = "2023-08-23"
 
-# enable cron if you want set auto clean up
+
+
+# 如果你想使用自定义域名，你需要添加 routes 配置
+routes = [
+  { pattern = "mail.chiziingiin.top", custom_domain = true },
+]
+node_compat = true
+
+# 如果你想要使用定时任务清理邮件，取消下面的注释，并修改 cron 表达式
 # [triggers]
 # crons = [ "0 0 * * *" ]
 
-# send_email = [
-#    { name = "SEND_MAIL" },
-# ]
+通过 Cloudflare 发送邮件
+send_email = [
+   { name = "SEND_MAIL" },
+]
 
 [vars]
-# TITLE = "Custom Title" # custom title
-PREFIX = "tmp"
-# (min, max) length of the adderss, if not set, the default is (1, 30)
+TITLE = "Chiziingiin Mail System" # 自定义网站标题
+PREFIX = "" # 要处理的邮箱名称前缀，不需要后缀可配置为空字符串
+# (min, max) adderss的长度，如果不设置，默认为(1, 30)
 # MIN_ADDRESS_LEN = 1
 # MAX_ADDRESS_LEN = 30
-# IF YOU WANT TO MAKE YOUR SITE PRIVATE, UNCOMMENT THE FOLLOWING LINES
-# PASSWORDS = ["123", "456"]
-# For admin panel
-# ADMIN_PASSWORDS = ["123", "456"]
-# ADMIN CONTACT, CAN BE ANY STRING
-# ADMIN_CONTACT = "xx@xx.xxx"
-DOMAINS = ["xxx.xxx1" , "xxx.xxx2"]
-JWT_SECRET = "xxx"
-BLACK_LIST = ""
-# Allow users to create email addresses
+# 如果你想要你的网站私有，取消下面的注释，并修改密码
+PASSWORDS = ["mailsystem", "mailsystem76760086"]
+# admin 控制台密码, 不配置则不允许访问控制台
+ADMIN_PASSWORDS = ["mailsystem", "mailsystem76760086"]
+# admin 联系方式，不配置则不显示，可配置任意字符串
+ADMIN_CONTACT = "admin@chiziingiin.top"
+DOMAINS = ["chiziingiin.top" , "xxx.xxx2"] # 你的域名, 支持多个域名
+JWT_SECRET = "xxx" # 用于生成 jwt 的密钥, jwt 用于给用户登录以及鉴权
+BLACK_LIST = "" # 黑名单，用于过滤发件人，逗号分隔
+# 是否允许用户创建邮件, 不配置则不允许
 ENABLE_USER_CREATE_EMAIL = true
-# Allow users to delete messages
+# 允许用户删除邮件, 不配置则不允许
 ENABLE_USER_DELETE_EMAIL = true
-# Allow automatic replies to emails
+# 允许自动回复邮件
 ENABLE_AUTO_REPLY = false
-# Allow webhook
+# 是否启用 webhook
 # ENABLE_WEBHOOK = true
-# Footer text
+# 前端界面页脚文本
 # COPYRIGHT = "Dream Hunter"
-# default send balance, if not set, it will be 0
+# 默认发送邮件余额，如果不设置，将为 0
 # DEFAULT_SEND_BALANCE = 1
-# Turnstile verification
+# Turnstile 人机验证配置
 # CF_TURNSTILE_SITE_KEY = ""
 # CF_TURNSTILE_SECRET_KEY = ""
 # dkim config
-# DKIM_SELECTOR = ""
-# DKIM_PRIVATE_KEY = ""
-# telegram bot
+# DKIM_SELECTOR = "mailchannels" # 参考 DKIM 部分 mailchannels._domainkey 的 mailchannels
+# DKIM_PRIVATE_KEY = "" # 参考 DKIM 部分 priv_key.txt 的内容
+# telegram bot 最多绑定邮箱数量
 # TG_MAX_ACCOUNTS = 5
-# global forward address list, if set, all emails will be forwarded to these addresses
+# 全局转发地址列表，如果不配置则不启用，启用后所有邮件都会转发到列表中的地址
 # FORWARD_ADDRESS_LIST = ["xxx@xxx.com"]
 
+# D1 数据库的名称和 ID 可以在 cloudflare 控制台查看
 [[d1_databases]]
 binding = "DB"
-database_name = "xxx"
-database_id = "xxx"
+database_name = "mail" # D1 数据库名称
+database_id = "e68d621d-89d1-4dc7-ab36-e03a483aeb6f" # D1 数据库 ID
 
-# kv config for send email verification code
+# kv config 用于用户注册发送邮件验证码，如果不启用用户注册或不启用注册验证，可以不配置
 # [[kv_namespaces]]
 # binding = "KV"
 # id = "xxxx"
 
-# ratelimit config for /api/new_address
+# 新建地址限流配置 /api/new_address
 # [[unsafe.bindings]]
 # name = "RATE_LIMITER"
 # type = "ratelimit"
